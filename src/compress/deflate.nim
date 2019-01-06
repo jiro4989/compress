@@ -61,10 +61,10 @@ proc encode(node: Node) =
   node.right.encode
 
 proc toTable(node: Node, tbl: var Table[char, uint64]): Table[char, uint64] =
-  if node.left == nil or node.right == nil:
-    return tbl
   if node.value != '\0':
     tbl[node.value] = node.bin
+  if node.left == nil or node.right == nil:
+    return tbl
   discard node.left.toTable tbl
   return node.right.toTable tbl
 
