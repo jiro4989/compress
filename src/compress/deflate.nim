@@ -12,6 +12,7 @@ type
     count: int
   
 proc show(n: Node, depth: int = 0, prefix: string = "") =
+  ## show is echo tree structure text for debugging.
   let
     value = n.value
     left = n.left
@@ -24,9 +25,8 @@ proc show(n: Node, depth: int = 0, prefix: string = "") =
   if right != nil:
     show(right, depth + 1, "R")
 
-when isMainModule:
+proc toTreeNode(datas: string): Node =
   var nodes: seq[Node]
-  let datas = "DAEBCBACBBBC"
 
   # count chars and add nodes
   for c in datas.deduplicate:
@@ -35,6 +35,7 @@ when isMainModule:
     node.count = datas.count c
     nodes.add node
 
+  # struct tree nodes.
   while 2 <= nodes.len:
     nodes.sort(proc(x, y: Node): int = cmp(x.count, y.count))
     var
@@ -47,6 +48,10 @@ when isMainModule:
     n.left  = tmp[0]
     n.right = tmp[1]
     nodes.add n
+
+  return nodes[0]
+
+when isMainModule:
+  let datas = "DAEBCBACBBBC"
+  datas.toTreeNode.show
   
-  for n in nodes:
-    show(n)
