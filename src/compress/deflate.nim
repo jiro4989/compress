@@ -20,7 +20,7 @@ proc show(n: Node, depth: int = 0, prefix: string = "") =
     count = n.count
     bin = n.bin
     indent = "  ".repeat(depth).join
-  echo &"{indent}+ [{prefix}] (value: {value}, count: {count}, bin:{bin:#b})"
+  echo &"{indent}+ [{prefix}] (value: {value}, count: {count}, bin: {bin:#b})"
   if left != nil:
     show(left, depth + 1, "L")
   if right != nil:
@@ -55,8 +55,9 @@ proc toTreeNode(datas: string): Node =
 proc encode(node: Node): Node =
   if node.left == nil or node.right == nil:
     return node
-  node.left.bin = node.bin shr 0
-  node.right.bin = node.bin shr 1
+  node.left.bin = node.bin shl 1
+  node.right.bin = node.bin shl 1
+  node.right.bin += 0b01
   discard node.right.encode
   return node
 
