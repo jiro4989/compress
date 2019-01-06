@@ -66,12 +66,19 @@ proc toTable(node: Node, tbl: var Table[char, uint64]): Table[char, uint64] =
   discard node.left.toTable tbl
   return node.right.toTable tbl
 
-proc toTable*(node: Node): Table[char, uint64] =
+proc toTable(node: Node): Table[char, uint64] =
   var tbl = initTable[char, uint64]()
   return node.toTable tbl
 
-when isMainModule:
-  var node = "DAEBCBACBBBC".toTreeNode
+proc encode*(data: string) =
+  var node = data.toTreeNode
   node.setBin
   node.show
-  echo node.toTable
+  var tbl = node.toTable
+  echo tbl
+
+proc decode*() =
+  discard
+
+when isMainModule:
+  "DAEBCBACBBBC".encode
