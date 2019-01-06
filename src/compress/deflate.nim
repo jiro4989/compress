@@ -1,7 +1,6 @@
 # Wikipedia - ハフマン符号 https://ja.wikipedia.org/wiki/%E3%83%8F%E3%83%95%E3%83%9E%E3%83%B3%E7%AC%A6%E5%8F%B7
 
-import tables, sequtils, strutils
-from strformat import `&`
+import tables, sequtils, strutils, strformat
 from algorithm import sort
 
 type
@@ -10,6 +9,7 @@ type
     left: Node
     right: Node
     count: int
+    bin: uint64
   
 proc show(n: Node, depth: int = 0, prefix: string = "") =
   ## show is echo tree structure text for debugging.
@@ -18,8 +18,9 @@ proc show(n: Node, depth: int = 0, prefix: string = "") =
     left = n.left
     right = n.right
     count = n.count
+    bin = n.bin
     indent = "  ".repeat(depth).join
-  echo &"{indent}+ [{prefix}] (value: {value}, count: {count})"
+  echo &"{indent}+ [{prefix}] (value: {value}, count: {count}, bin:{bin:#b})"
   if left != nil:
     show(left, depth + 1, "L")
   if right != nil:
@@ -51,7 +52,13 @@ proc toTreeNode(datas: string): Node =
 
   return nodes[0]
 
+proc encode(node: Node): Node =
+  if node.left == nil or node.right == nil:
+    return node
+  node.left.bin = node.bin shr 0
+  node.right.bin = node.bin shr 1
+  discard node.right.encode
+  return node
+
 when isMainModule:
-  let datas = "DAEBCBACBBBC"
-  datas.toTreeNode.show
-  
+  "DAEBCBACBBBC".toTreeNode.encode.show
