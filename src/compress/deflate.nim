@@ -11,7 +11,7 @@ type
     right: Node
     count: int
   
-proc echoTree(n: Node, depth: int, prefix: string = "") =
+proc show(n: Node, depth: int = 0, prefix: string = "") =
   let
     value = n.value
     left = n.left
@@ -20,9 +20,9 @@ proc echoTree(n: Node, depth: int, prefix: string = "") =
     indent = "  ".repeat(depth).join
   echo &"{indent}+ [{prefix}] (value: {value}, count: {count})"
   if left != nil:
-    echoTree(left, depth + 1, "L")
+    show(left, depth + 1, "L")
   if right != nil:
-    echoTree(right, depth + 1, "R")
+    show(right, depth + 1, "R")
 
 when isMainModule:
   var nodes: seq[Node]
@@ -35,9 +35,8 @@ when isMainModule:
     node.count = datas.count c
     nodes.add node
 
-  nodes.sort(proc(x, y: Node): int = cmp(x.count, y.count))
-
   while 2 <= nodes.len:
+    nodes.sort(proc(x, y: Node): int = cmp(x.count, y.count))
     var
       n = new Node
       tmp: seq[Node]
@@ -50,5 +49,4 @@ when isMainModule:
     nodes.add n
   
   for n in nodes:
-    echoTree(n, 0)
-    echo "----------"
+    show(n)
