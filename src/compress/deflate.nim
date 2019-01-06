@@ -39,15 +39,13 @@ proc toTreeNode(datas: string): Node =
   # struct tree nodes.
   while 2 <= nodes.len:
     nodes.sort(proc(x, y: Node): int = cmp(x.count, y.count))
-    var
-      n = new Node
-      tmp: seq[Node]
+    var tmp: seq[Node]
     for node in nodes[0..1]:
       tmp.add node
       nodes.delete 0
-    n.count = tmp[0].count + tmp[1].count
-    n.left  = tmp[0]
-    n.right = tmp[1]
+    var
+      c = tmp[0].count + tmp[1].count
+      n = Node(count: c, left: tmp[0], right: tmp[1])
     nodes.add n
 
   return nodes[0]
