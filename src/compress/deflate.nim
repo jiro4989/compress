@@ -52,14 +52,28 @@ proc toTreeNode(datas: string): Node =
 
   return nodes[0]
 
-proc encode(node: Node): Node =
+proc encode(node: Node) =
   if node.left == nil or node.right == nil:
-    return node
+    return
   node.left.bin = node.bin shl 1
   node.right.bin = node.bin shl 1
   node.right.bin += 0b01
-  discard node.right.encode
-  return node
+  node.right.encode
+
+proc toTable(node: Node, tbl: var Table[char, uint64]): Table[char, uint64] =
+  if node.left == nil or node.right == nil:
+    return tbl
+  if node.value != '\0':
+    tbl[node.value] = node.bin
+  discard node.left.toTable tbl
+  return node.right.toTable tbl
+
+proc toTable*(node: Node): Table[char, uint64] =
+  var tbl = initTable[char, uint64]()
+  return node.toTable tbl
 
 when isMainModule:
-  "DAEBCBACBBBC".toTreeNode.encode.show
+  var node = "DAEBCBACBBBC".toTreeNode
+  node.encode
+  node.show
+  echo node.toTable
