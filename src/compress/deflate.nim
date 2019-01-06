@@ -50,13 +50,13 @@ proc toTreeNode(datas: string): Node =
 
   return nodes[0]
 
-proc encode(node: Node) =
+proc setBin(node: Node) =
   if node.left == nil or node.right == nil:
     return
   node.left.bin = node.bin shl 1
   node.right.bin = node.bin shl 1
   node.right.bin += 0b01
-  node.right.encode
+  node.right.setBin
 
 proc toTable(node: Node, tbl: var Table[char, uint64]): Table[char, uint64] =
   if node.value != '\0':
@@ -72,6 +72,6 @@ proc toTable*(node: Node): Table[char, uint64] =
 
 when isMainModule:
   var node = "DAEBCBACBBBC".toTreeNode
-  node.encode
+  node.setBin
   node.show
   echo node.toTable
