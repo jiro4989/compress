@@ -7,14 +7,17 @@ proc getTheLongestMatched(window, byteSeq: openArray[byte], pos: int): seq[byte]
 
   # スライドウィンドウ内に、精査対象のシーケンスの先頭の文字が一致する位置を取得
   # 一致するものが一つも存在しないときは早期リターン
-  let byteSeqPart = byteSeq[pos..<pos+window.len]
-  let headByte = byteSeqPart[0]
+  let n = if pos+window.len < byteSeq.len: pos+window.len
+          else: byteSeq.len - 1
+  let byteSeqPart = byteSeq[pos..<n]
   var startPoses: seq[int]
-  for i, v in window:
-    if v == headByte:
-      startPoses.add i
-  if startPoses.len < 1:
-    return
+  block:
+    let headByte = byteSeqPart[0]
+    for i, v in window:
+      if v == headByte:
+        startPoses.add i
+    if startPoses.len < 1:
+      return
 
   # matched[0] == pos
   # matched[1] == length
@@ -41,6 +44,7 @@ proc getTheLongestMatched(window, byteSeq: openArray[byte], pos: int): seq[byte]
     l = matched[matched.len-1]
     pos = l[0]
     length = l[1]
+  ## TODO 一致した位置と長さを返すようにしないといけない
   result = window[pos..pos+length]
 
 proc encode*(byteSeq: openArray[byte], windowSize: int = 8124): seq[byte] =
