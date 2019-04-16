@@ -30,10 +30,7 @@ proc getTheLongestMatched(window, byteSeq: openArray[byte], pos: int): seq[byte]
     var i: int
     while true:
       var j = pos + i
-      if window.len <= j:
-        matched.add @[pos, i-1]
-        break
-      if window[j] != byteSeqPart[i]:
+      if window.len <= j or window[j] != byteSeqPart[i]:
         matched.add @[pos, i-1]
         break
       i.inc
