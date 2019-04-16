@@ -7,6 +7,9 @@ from sequtils import repeat, concat
 from strutils import join, parseInt
 
 proc encode*(s: string): string =
+  ## 文字列を圧縮して返す。
+  ## 圧縮の際の「何文字連続しているか」のカウンタが255以上でも
+  ## 文字の連続を分離しない。
   let runes = s.toRunes
   var continuumLen = 1
   for i, r in runes:
@@ -22,7 +25,11 @@ proc encode*(s: string): string =
     result.add $continuumLen & $r
     continuumLen = 1
 
-proc encode*(bs: seq[byte]): seq[byte] =
+proc encode*(bs: openArray[byte]): seq[byte] =
+  ## 文字列を圧縮して返す。
+  ## 圧縮の際の「何文字連続しているか」のカウンタが255(1byte)まで。
+  ## 255文字以上連続する場合は、一旦255で文字を区切り、
+  ## カウンタを初期化してカウントし直す。
   var continuumLen = 1
   for i, r in bs:
     let i2 = i + 1
@@ -48,6 +55,8 @@ proc encode*(bs: seq[byte]): seq[byte] =
     continuumLen = 1
 
 proc decode*(s: string): string =
+  ## 文字列を解凍して返す。
+  ## 圧縮の際の「何文字連続しているか」のカウンタが255以上でも動作する。
   let runes = s.toRunes
   var num: string
   for i, v in runes:
@@ -59,7 +68,9 @@ proc decode*(s: string): string =
       result.add c.repeat(cnt).join("")
       num = ""
 
-proc decode*(bs: seq[byte]): seq[byte] =
+proc decode*(bs: openArray[byte]): seq[byte] =
+  ## 文字列を解凍して返す。
+  ## 圧縮の際の「何文字連続しているか」のカウンタは255以下でなければならない。
   var cnt: int
   for i, v in bs:
     if i mod 2 == 0:
