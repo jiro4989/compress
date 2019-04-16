@@ -1,7 +1,11 @@
 from sequtils import delete
 from algorithm import sort
 
-proc getTheLongestMatched(window, byteSeq: openArray[byte], pos: int): seq[byte] =
+type
+  MatchedPos = object
+    pos, length: int
+
+proc getTheLongestMatched(window, byteSeq: openArray[byte], pos: int): MatchedPos =
   if byteSeq.len < 1:
     return
 
@@ -21,7 +25,7 @@ proc getTheLongestMatched(window, byteSeq: openArray[byte], pos: int): seq[byte]
 
   # matched[0] == pos
   # matched[1] == length
-  var matched: seq[seq[int]]
+  var matched: seq[MatchedPos]
   # 一致した位置シーケンスを回し
   # 精査対象と一致し続ける限り、カウンターを増やし続ける
   # 合わなくなったときにwhileを抜けて、次の位置シーケンスを処理
@@ -31,37 +35,33 @@ proc getTheLongestMatched(window, byteSeq: openArray[byte], pos: int): seq[byte]
     while true:
       var j = pos + i
       if window.len <= j or window[j] != byteSeqPart[i]:
-        matched.add @[pos, i-1]
+        matched.add MatchedPos(pos: pos, length: i)
         break
       i.inc
 
   # マッチした長さ順でソートし、最大長のものを取得
-  matched.sort(proc (x, y: seq[int]): int = cmp(x[1], y[1]))
-  let
-    l = matched[matched.len-1]
-    pos = l[0]
-    length = l[1]
-  ## TODO 一致した位置と長さを返すようにしないといけない
-  result = window[pos..pos+length]
+  matched.sort(proc (x, y: MatchedPos): int = cmp(x.length, y.length))
+  result = matched[matched.len-1]
 
 proc encode*(byteSeq: openArray[byte], windowSize: int = 8124): seq[byte] =
-  ## 位置文字ずつ精査し、Windowサイズ内に同じ文字が存在したら、
-  ## その参照を書く。
-  var i: int
-  var window: seq[byte]
-  for _ in 0..<byteSeq.len:
-    if byteSeq.len <= i:
-      break
-    if windowSize < window.len:
-      window.delete(0, 1)
+  discard
+  # ## 位置文字ずつ精査し、Windowサイズ内に同じ文字が存在したら、
+  # ## その参照を書く。
+  # var i: int
+  # var window: seq[byte]
+  # for _ in 0..<byteSeq.len:
+  #   if byteSeq.len <= i:
+  #     break
+  #   if windowSize < window.len:
+  #     window.delete(0, 1)
 
-    let v = byteSeq[i]
-    let matched = window.getTheLongestMatched(byteSeq, i)
-    if matched.len < 1:
-      # マッチするものが存在しなかった場合
-      result.add v
-      i.inc
-    else:
-      result.add matched
-      i.inc matched.len
-    window.add v
+  #   let v = byteSeq[i]
+  #   let matched = window.getTheLongestMatched(byteSeq, i)
+  #   if matched.len < 1:
+  #     # マッチするものが存在しなかった場合
+  #     result.add v
+  #     i.inc
+  #   else:
+  #     result.add matched
+  #     i.inc matched.len
+  #   window.add v
