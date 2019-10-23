@@ -6,25 +6,6 @@ import unicode
 from sequtils import repeat, concat
 from strutils import join, parseInt
 
-proc encode*(s: string): string =
-  ## 文字列を圧縮して返す。
-  ## 圧縮の際の「何文字連続しているか」のカウンタが255以上でも
-  ## 文字の連続を分離しない。
-  let runes = s.toRunes
-  var continuumLen = 1
-  for i, r in runes:
-    let i2 = i + 1
-    if runes.len <= i2:
-      result.add $continuumLen & $r
-      break
-
-    let nextRune = runes[i2]
-    if r == nextRune:
-      inc(continuumLen)
-      continue
-    result.add $continuumLen & $r
-    continuumLen = 1
-
 proc encode*(bs: openArray[byte]): seq[byte] =
   ## 文字列を圧縮して返す。
   ## 圧縮の際の「何文字連続しているか」のカウンタが255(1byte)まで。
@@ -53,20 +34,6 @@ proc encode*(bs: openArray[byte]): seq[byte] =
     result.add continuumLen.byte
     result.add r
     continuumLen = 1
-
-proc decode*(s: string): string =
-  ## 文字列を解凍して返す。
-  ## 圧縮の際の「何文字連続しているか」のカウンタが255以上でも動作する。
-  let runes = s.toRunes
-  var num: string
-  for i, v in runes:
-    let c = $v
-    if c in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]:
-      num.add c
-    else:
-      let cnt = num.parseInt
-      result.add c.repeat(cnt).join("")
-      num = ""
 
 proc decode*(bs: openArray[byte]): seq[byte] =
   ## 文字列を解凍して返す。
