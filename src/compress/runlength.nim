@@ -12,37 +12,33 @@ proc encode*(bs: openArray[byte]): seq[byte] =
   ## 255文字以上連続する場合は、一旦255で文字を区切り、
   ## カウンタを初期化してカウントし直す。
   var continuumLen = 1
-  for i, r in bs:
+  for i, b in bs:
     let i2 = i + 1
     if bs.len <= i2:
       while 255 < continuumLen:
-        result.add 255'u8
-        result.add r
-        continuumLen.dec 255
-      result.add continuumLen.byte
-      result.add r
+        result.add(b)
+        result.add(255'u8)
+        dec(continuumLen, 255)
+      result.add(b)
+      result.add(byte(continuumLen))
       break 
-    let nextRune = bs[i2]
-    if r == nextRune:
+    let nextByte = bs[i2]
+    if b == nextByte:
       inc(continuumLen)
       continue
 
     while 255 < continuumLen:
-      result.add 255'u8
-      result.add r
-      continuumLen.dec 255
-    result.add continuumLen.byte
-    result.add r
+      result.add(b)
+      result.add(255'u8)
+      dec(continuumLen, 255)
+    result.add(b)
+    result.add(byte(continuumLen))
     continuumLen = 1
 
 proc decode*(bs: openArray[byte]): seq[byte] =
   ## 文字列を解凍して返す。
   ## 圧縮の際の「何文字連続しているか」のカウンタは255以下でなければならない。
-  var cnt: int
   for i, v in bs:
     if i mod 2 == 0:
-      # v is counter byte.
-      cnt = v.int
-    else:
-      # v is character byte.
+      let cnt = int(bs[i+1])
       result = result.concat(v.repeat(cnt))
